@@ -100,7 +100,15 @@ export function getHttpRpcClient(
               signal: signal_ || (timeout > 0 ? signal : null),
             })
             if (onRequest) await onRequest(request)
-            const response = await fetch(request)
+            let response: Response
+            // @ts-expect-error ignore
+            const dispatcher = options?.fetchOptions?.dispatcher
+            if (dispatcher) {
+              // @ts-expect-error ignore
+              response = await fetch(request, { dispatcher })
+            } else {
+              response = await fetch(request)
+            }
             return response
           },
           {
